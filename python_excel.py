@@ -77,6 +77,39 @@ def read_excel_jianhang(file_name):
 	global all_infos
 	all_infos.append(l_jianhang)
 
+#读取招商银行流水线，并把相关信息append进入前面定义的两个list
+def read_excel_zhaohang(file_name):
+	
+	wb = xlrd.open_workbook(file_name)
+	sh = wb.sheet_by_index(0)
+	bank_name = '招商银行'
+	count = ''
+	count_name = ''
+	l_zhaohang = ['招商银行' + file_name.replace('.xls',''),count]
+	# global bank_info
+	# bank_info.append({'bank_name':'建行','count':count})
+	for i in range(sh.nrows):
+		if i > 0:
+			if sh.row_values(i)[0] != '':
+				date = sh.row_values(i)[0] #日期格式格式化为20170102				
+				if isinstance(sh.row_values(i)[1],float):
+					money_out = sh.row_values(i)[1]
+				else:
+					money_out = ''	
+				if isinstance(sh.row_values(i)[2],float):
+					money_in = sh.row_values(i)[2]
+				else:
+					money_in = ''		 
+				money_now = sh.row_values(i)[3]				
+				to_count_name = sh.row_values(i)[5]	
+				to_count = sh.row_values(i)[6]
+				beizhu = sh.row_values(i)[4]
+
+				# l.append((count,date,money_out,money_in,money_now,to_count_name,to_count,beizhu))
+				l_zhaohang.append({"count":count,"date":date,"money_out":money_out,"money_in":money_in,"money_now":money_now,"to_count_name":to_count_name,"to_count":to_count,"beizhu":beizhu})
+	global all_infos
+	all_infos.append(l_zhaohang)
+
 #读取中信银行流水线，并把相关信息append进入前面定义的两个list
 def read_excel_zhongxin(file_name):
 	wb = xlrd.open_workbook(file_name)
@@ -183,8 +216,8 @@ def write_excel(all_infos):
 		sheet.write(4, 16+3*i, '结存',style_title)
 		for j in range(len(all_infos[i]) - 2):
 			#下面需要通过正则匹配获取日期中正整数，如20170102，取出01时要输出1
-			sheet.write(5+j + info_count, 0, re.findall(r"[1-9]\d*",all_infos[i][j+2]['date'][4:6]),style_num_align) 
-			sheet.write(5+j + info_count, 1, re.findall(r"[1-9]\d*",all_infos[i][j+2]['date'][-2:]),style_num_align)
+			sheet.write(5+j + info_count, 0, re.findall(r"[1-9]\d*",str(all_infos[i][j+2]['date'])[4:6]),style_num_align) 
+			sheet.write(5+j + info_count, 1, re.findall(r"[1-9]\d*",str(all_infos[i][j+2]['date'])[-4:-2]),style_num_align)
 			sheet.write(5+j + info_count, 3, all_infos[i][j+2]['beizhu'],style_content)
 			sheet.write(5+j + info_count, 4, '公账',style_content)
 			sheet.write(5+j + info_count, 5, all_infos[i][0][0:4],style_content)
@@ -209,6 +242,8 @@ for i in os.listdir():
 			read_excel_jianhang(i)
 		if '中信' in i:
 			read_excel_zhongxin(i)
+		if '招行' in i or '招商银行' in i:
+			read_excel_zhaohang(i) 
 			
 write_excel(all_infos)
 
