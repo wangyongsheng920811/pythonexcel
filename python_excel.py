@@ -217,7 +217,7 @@ def write_excel(all_infos):
 		for j in range(len(all_infos[i]) - 2):
 			#下面需要通过正则匹配获取日期中正整数，如20170102，取出01时要输出1
 			sheet.write(5+j + info_count, 0, re.findall(r"[1-9]\d*",str(all_infos[i][j+2]['date'])[4:6]),style_num_align) 
-			sheet.write(5+j + info_count, 1, re.findall(r"[1-9]\d*",str(all_infos[i][j+2]['date'])[-4:-2]),style_num_align)
+			sheet.write(5+j + info_count, 1, re.findall(r"[1-9]\d*",str(all_infos[i][j+2]['date'])[6:8]),style_num_align)
 			sheet.write(5+j + info_count, 3, all_infos[i][j+2]['beizhu'],style_content)
 			sheet.write(5+j + info_count, 4, '公账',style_content)
 			sheet.write(5+j + info_count, 5, all_infos[i][0][0:4],style_content)
