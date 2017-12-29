@@ -14,6 +14,7 @@ bank_info = []
 
 #读取浦发银行流水线，并把相关信息append进入前面定义的两个list
 def read_excel_pufa(file_name):
+	print('正在读取',file_name,'......')
 	wb = xlrd.open_workbook(file_name)
 	sh = wb.sheet_by_index(0)
 	count = sh.cell(0,1).value #账号
@@ -46,10 +47,11 @@ def read_excel_pufa(file_name):
 				# l.append((count,date,money_out,money_in,money_now,to_count_name,to_count,beizhu))
 	global all_infos
 	all_infos.append(l_pufa)
+	print('读取',file_name,'成功，准备合并数据......')
 
 #读取建设银行流水线，并把相关信息append进入前面定义的两个list
 def read_excel_jianhang(file_name):
-	
+	print('正在读取',file_name,'......')
 	wb = xlrd.open_workbook(file_name)
 	sh = wb.sheet_by_index(0)
 	bank_name = sh.cell(3,1).value
@@ -80,10 +82,11 @@ def read_excel_jianhang(file_name):
 				l_jianhang.append({"count":count,"date":date,"money_out":money_out,"money_in":money_in,"money_now":money_now,"to_count_name":to_count_name,"to_count":to_count,"beizhu":beizhu})
 	global all_infos
 	all_infos.append(l_jianhang)
+	print('读取',file_name,'成功，准备合并数据......')
 
 #读取招商银行流水线，并把相关信息append进入前面定义的两个list
 def read_excel_zhaohang(file_name):
-	
+	print('正在读取',file_name,'......')
 	wb = xlrd.open_workbook(file_name)
 	sh = wb.sheet_by_index(0)
 	bank_name = '招商银行'
@@ -114,9 +117,11 @@ def read_excel_zhaohang(file_name):
 				l_zhaohang.append({"count":count,"date":date,"money_out":money_out,"money_in":money_in,"money_now":money_now,"to_count_name":to_count_name,"to_count":to_count,"beizhu":beizhu})
 	global all_infos
 	all_infos.append(l_zhaohang)
+	print('读取',file_name,'成功，准备合并数据......')
 
 #读取中信银行流水线，并把相关信息append进入前面定义的两个list
 def read_excel_zhongxin(file_name):
+	print('正在读取',file_name,'......')
 	wb = xlrd.open_workbook(file_name)
 	sh = wb.sheet_by_index(0)
 	count = sh.cell(1,3).value #账号
@@ -149,9 +154,11 @@ def read_excel_zhongxin(file_name):
 				# l.append((count,date,money_out,money_in,money_now,to_count_name,to_count,beizhu))
 	global all_infos
 	all_infos.append(l_zhongxin)
+	print('读取',file_name,'成功，准备合并数据......')
 
 #写excel，
 def write_excel(all_infos):
+	print('开始合并数据......')
 	wbk = xlwt.Workbook(encoding='utf-8')
 	
 	sheet = wbk.add_sheet('sheet 1')
@@ -272,9 +279,12 @@ def write_excel(all_infos):
 		sheet.write(5 + info_count, 13 + k * 3, float(all_money_ins[k]['all_money_out']),style_num)
 		sheet.write(5 + info_count, 14 + k * 3, float(all_money_ins[k]['all_money_now']),style_num)
 	sheet.write(5 + info_count, 3, '合计',style_title)
+	sheet.write(5 + info_count, 6, float(money_ins),style_num)
 	sheet.write(5 + info_count, 7, float(money_outs),style_num)
 	sheet.write(5 + info_count, 8, float(money_nows),style_num)
-	wbk.save('日记账' + time.strftime('%Y%m%d%H%M%S',time.localtime()) + '.xls') #循环输入后保存，此时的文件名对应的文件可以存在，会被覆盖，但是不能是打开状态，会报错
+	name = '日记账' + time.strftime('%Y%m%d%H%M%S',time.localtime()) + '.xls'
+	wbk.save(name) #循环输入后保存，此时的文件名对应的文件可以存在，会被覆盖，但是不能是打开状态，会报错
+	print('数据合并成功！合并后的文件为：',name)
 
 for i in os.listdir():
 	if 'xls' in i:
@@ -289,4 +299,4 @@ for i in os.listdir():
 			
 write_excel(all_infos)
 
-input('计算成功，按任意键退出！')
+input('按任意键退出！')
