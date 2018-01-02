@@ -19,7 +19,7 @@ def read_excel_pufa(file_name):
 	sh = wb.sheet_by_index(0)
 	count = sh.cell(0,1).value #账号
 	count_name = sh.cell(1,1).value #账户名 
-	if count != '账号' or count_name != '账户名':
+	if sh.cell(0,0).value != '账号' or sh.cell(1,0).value != '账户名称':
 		print(file_name,'银行流水表格式错误！')
 		return
 	bank_type = file_name.replace('.xls','')[2:]
