@@ -19,6 +19,9 @@ def read_excel_pufa(file_name):
 	sh = wb.sheet_by_index(0)
 	count = sh.cell(0,1).value #账号
 	count_name = sh.cell(1,1).value #账户名 
+	if count != '账号' or count_name != '账户名':
+		print(file_name,'银行流水表格式错误！')
+		return
 	bank_type = file_name.replace('.xls','')[2:]
 	l_pufa = [bank_type,count] #银行名和账号放进一个临时list，后面把所有信息一起作为一个list，append进all_info，后面取值方便
 	for i in range(sh.nrows):
@@ -54,6 +57,9 @@ def read_excel_jianhang(file_name):
 	print('正在读取',file_name,'......')
 	wb = xlrd.open_workbook(file_name)
 	sh = wb.sheet_by_index(0)
+	if sh.cell(0,0).value != '中国建设银行':
+		print(file_name,'银行流水表格式错误！')
+		return
 	bank_name = sh.cell(3,1).value
 	count = sh.cell(4,1).value
 	count_name = sh.cell(5,1).value
@@ -89,6 +95,9 @@ def read_excel_zhaohang(file_name):
 	print('正在读取',file_name,'......')
 	wb = xlrd.open_workbook(file_name)
 	sh = wb.sheet_by_index(0)
+	if sh.cell(0,0).value != '交易日':
+		print(file_name,'银行流水表格式错误！')
+		return
 	bank_name = '招商银行'
 	count = ''
 	count_name = ''
@@ -124,6 +133,9 @@ def read_excel_zhongxin(file_name):
 	print('正在读取',file_name,'......')
 	wb = xlrd.open_workbook(file_name)
 	sh = wb.sheet_by_index(0)
+	if sh.cell(3,0).value != '交易日期':
+		print(file_name,'银行流水表格式错误！')
+		return
 	count = sh.cell(1,3).value #账号
 	count_name = sh.cell(1,1).value #账户名
 	bank_type = file_name.replace('.xls','')[2:]
@@ -285,6 +297,9 @@ def write_excel(all_infos):
 	name = '日记账' + time.strftime('%Y%m%d%H%M%S',time.localtime()) + '.xls'
 	wbk.save(name) #循环输入后保存，此时的文件名对应的文件可以存在，会被覆盖，但是不能是打开状态，会报错
 	print('数据合并成功！合并后的文件为：',name)
+
+print('使用方法：将各银行原始流水表和本程序放在同一文件夹下，并将流水表按照想要的顺序重命名，如：1-建设银行基本户，数字为顺序，银行名必须是全名，如建设银行，不能写成建行；后面基本户为账户类型，有则写，没有就不写！')
+input('按任意键开始程序！')
 
 for i in os.listdir():
 	if 'xls' in i:
