@@ -11,6 +11,9 @@ from decimal import getcontext
 #定义两个全局list，all_info存储每个excel内容，bank_info存储表格内银行名，以便后面根据银行名来确认写excel时输出位置
 all_infos = []
 bank_info = []
+file_count = 0
+success_count = 0
+fail_cout = 0
 
 #读取浦发银行流水线，并把相关信息append进入前面定义的两个list
 def read_excel_pufa(file_name):
@@ -21,6 +24,8 @@ def read_excel_pufa(file_name):
 	count_name = sh.cell(1,1).value #账户名 
 	if sh.cell(0,0).value != '账号' or sh.cell(1,0).value != '账户名称':
 		print(file_name,'银行流水表格式错误！')
+		global fail_cout
+		fail_cout = fail_cout + 1
 		return
 	bank_type = file_name.replace('.xls','')[2:]
 	l_pufa = [bank_type,count] #银行名和账号放进一个临时list，后面把所有信息一起作为一个list，append进all_info，后面取值方便
@@ -50,6 +55,8 @@ def read_excel_pufa(file_name):
 				# l.append((count,date,money_out,money_in,money_now,to_count_name,to_count,beizhu))
 	global all_infos
 	all_infos.append(l_pufa)
+	global success_count
+	success_count = success_count + 1
 	print('读取',file_name,'成功，准备合并数据......')
 
 #读取建设银行流水线，并把相关信息append进入前面定义的两个list
@@ -59,6 +66,8 @@ def read_excel_jianhang(file_name):
 	sh = wb.sheet_by_index(0)
 	if sh.cell(0,0).value != '中国建设银行':
 		print(file_name,'银行流水表格式错误！')
+		global fail_cout
+		fail_cout = fail_cout + 1
 		return
 	bank_name = sh.cell(3,1).value
 	count = sh.cell(4,1).value
@@ -88,6 +97,52 @@ def read_excel_jianhang(file_name):
 				l_jianhang.append({"count":count,"date":date,"money_out":money_out,"money_in":money_in,"money_now":money_now,"to_count_name":to_count_name,"to_count":to_count,"beizhu":beizhu})
 	global all_infos
 	all_infos.append(l_jianhang)
+	global success_count
+	success_count = success_count + 1
+	print('读取',file_name,'成功，准备合并数据......')
+
+#读取建设银行另一格式流水线，并把相关信息append进入前面定义的两个list
+def read_excel_jianhang_new(file_name):
+	print('正在读取',file_name,'......')
+	wb = xlrd.open_workbook(file_name)
+	sh = wb.sheet_by_index(0)
+	if sh.cell(0,0).value != '账号':
+		print(file_name,'银行流水表格式错误！')
+		global fail_cout
+		fail_cout = fail_cout + 1
+		return
+	bank_name = '建设银行'
+	count = sh.cell(1,0).value
+	count_name = sh.cell(1,1).value
+	file_name = file_name.replace('建行','建设银行')
+	bank_type = file_name.replace('.xls','')[2:]
+	l_jianhang_new = [bank_type,count]
+	# global bank_info
+	# bank_info.append({'bank_name':'建行','count':count})
+	for i in range(sh.nrows):
+		if i > 0:
+			if sh.row_values(i)[0] != '':
+				date = sh.row_values(i)[2][0:8] #日期格式格式化为20170102
+			
+				if isinstance(sh.row_values(i)[3],float):
+					money_out = sh.row_values(i)[3]
+				else:
+					money_out = ''	
+				if isinstance(sh.row_values(i)[4],float):
+					money_in = sh.row_values(i)[4]
+				else:
+					money_in = ''		 
+				money_now = sh.row_values(i)[5]				
+				to_count_name = sh.row_values(i)[7]	
+				to_count = sh.row_values(i)[8]
+				beizhu = sh.row_values(i)[12]
+
+				# l.append((count,date,money_out,money_in,money_now,to_count_name,to_count,beizhu))
+				l_jianhang_new.append({"count":count,"date":date,"money_out":money_out,"money_in":money_in,"money_now":money_now,"to_count_name":to_count_name,"to_count":to_count,"beizhu":beizhu})
+	global all_infos
+	all_infos.append(l_jianhang_new)
+	global success_count
+	success_count = success_count + 1
 	print('读取',file_name,'成功，准备合并数据......')
 
 #读取招商银行流水线，并把相关信息append进入前面定义的两个list
@@ -97,6 +152,8 @@ def read_excel_zhaohang(file_name):
 	sh = wb.sheet_by_index(0)
 	if sh.cell(0,0).value != '交易日':
 		print(file_name,'银行流水表格式错误！')
+		global fail_cout
+		fail_cout = fail_cout + 1
 		return
 	bank_name = '招商银行'
 	count = ''
@@ -126,6 +183,8 @@ def read_excel_zhaohang(file_name):
 				l_zhaohang.append({"count":count,"date":date,"money_out":money_out,"money_in":money_in,"money_now":money_now,"to_count_name":to_count_name,"to_count":to_count,"beizhu":beizhu})
 	global all_infos
 	all_infos.append(l_zhaohang)
+	global success_count
+	success_count = success_count + 1
 	print('读取',file_name,'成功，准备合并数据......')
 
 #读取中信银行流水线，并把相关信息append进入前面定义的两个list
@@ -135,6 +194,8 @@ def read_excel_zhongxin(file_name):
 	sh = wb.sheet_by_index(0)
 	if sh.cell(3,0).value != '交易日期':
 		print(file_name,'银行流水表格式错误！')
+		global fail_cout
+		fail_cout = fail_cout + 1
 		return
 	count = sh.cell(1,3).value #账号
 	count_name = sh.cell(1,1).value #账户名
@@ -166,6 +227,8 @@ def read_excel_zhongxin(file_name):
 				# l.append((count,date,money_out,money_in,money_now,to_count_name,to_count,beizhu))
 	global all_infos
 	all_infos.append(l_zhongxin)
+	global success_count
+	success_count = success_count + 1
 	print('读取',file_name,'成功，准备合并数据......')
 
 #写excel，
@@ -296,22 +359,35 @@ def write_excel(all_infos):
 	sheet.write(5 + info_count, 8, float(money_nows),style_num)
 	name = '日记账' + time.strftime('%Y%m%d%H%M%S',time.localtime()) + '.xls'
 	wbk.save(name) #循环输入后保存，此时的文件名对应的文件可以存在，会被覆盖，但是不能是打开状态，会报错
-	print('数据合并成功！合并后的文件为：',name)
+	print('数据合并成功！共',file_count,'个文件，成功',success_count,'个，失败',fail_cout,'个，合并后的文件为：',name)
 
 print('使用方法：将各银行原始流水表和本程序放在同一文件夹下，并将流水表按照想要的顺序重命名，如：1-建设银行基本户，数字为顺序，银行名必须是全名，如建设银行，不能写成建行；后面基本户为账户类型，有则写，没有就不写！')
 input('按任意键开始程序！')
+print('\n')
 
 for i in os.listdir():
 	if 'xls' in i:
 		if '浦发' in i:
+			file_count = file_count + 1
 			read_excel_pufa(i)
-		if '建设银行' in i or '建行' in i:
+			print('\n')
+		if '建设银行' in i:
+			file_count = file_count + 1
 			read_excel_jianhang(i)
+			print('\n')
+		if '建行' in i:
+			file_count = file_count + 1
+			read_excel_jianhang_new(i)
+			print('\n')
 		if '中信' in i:
+			file_count = file_count + 1
 			read_excel_zhongxin(i)
+			print('\n')
 		if '招行' in i or '招商银行' in i:
+			file_count = file_count + 1
 			read_excel_zhaohang(i) 
+			print('\n')
 			
 write_excel(all_infos)
-
+print('\n')
 input('按任意键退出！')
